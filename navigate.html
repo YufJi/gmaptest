@@ -74,35 +74,16 @@
     <script src="https://code.getmdl.io/1.3.0/material.min.js"></script>
     <script type="text/javascript">
       function deviceOrientationListener(event) {
-        console.log(event);
-        window.alpha = 0;
-        if(event.webkitCompassHeading) {
-          alpha = event.webkitCompassHeading;
-        } else {
-          alpha = 360 - event.alpha;
-          // document.body.innerHTML = "What user agent u r using???";
-        }
+        var acceleration = event.accelerationIncludingGravity;
+        window.speed = acceleration.x
         drawCurrentPosition(window.map, window.infoWindow);
+        // drawCurrentPosition(window.map, window.infoWindow);
       }
 
-      function motionHandler(event) {
-        // document.getElementById("interval").innerHTML = event.interval;
-        var acc = event.acceleration;
-        // document.getElementById("x").innerHTML = acc.x;
-        // document.getElementById("y").innerHTML = acc.y;
-        // document.getElementById("z").innerHTML = acc.z;
-        console.log(acc, accGravity, rotationRate);
-      }
-
-      // if (window.DeviceMotionEvent) {
-      //   window.addEventListener("devicemotion", motionHandler, false);
-      // } else {
-      //   document.body.innerHTML = "What user agent u r using???";
-      // }
-      if (window.DeviceOrientationEvent) {
-         window.addEventListener('deviceorientation', throttle(deviceOrientationListener, 10, 30))
+      if (window.DeviceMotionEvent) {
+        window.addEventListener("devicemotion", throttle(deviceOrientationListener, 1000, 1000));
       } else {
-         document.body.innerHTML = "What user agent u r using???";
+        document.body.innerHTML = "What user agent u r using???";
       }
       function throttle(method, delay, duration) {
         var timer = null,

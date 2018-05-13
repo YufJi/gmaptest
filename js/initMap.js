@@ -10,6 +10,7 @@ var circle = null;
 var line = null;
 var dashLine = null;
 let routes = [];
+let heading = 0;
 
 function initMap() {
    map = new google.maps.Map(document.getElementById('map'), {
@@ -18,10 +19,17 @@ function initMap() {
      mapTypeId: 'roadmap',
    });
    infoWindow = new google.maps.InfoWindow({map: map});
-   drawCurrentPosition(map, infoWindow);
-   // setInterval(() => {
-   //   drawCurrentPosition(map, infoWindow);
-   // }, 1000)
+     const blueline = new google.maps.Polyline({
+       path: latlng.map(item => {
+         return new google.maps.LatLng(item[0], item[1]);
+       }),
+       map: map,
+       geodesic: true,
+       strokeColor: '#87CEFA',
+       strokeOpacity: 1,
+       strokeWeight: 2,
+    });
+    drawCurrentPosition(map, infoWindow);
  }
 
  function handleLocationError(browserHasGeolocation, infoWindow, pos) {
@@ -33,9 +41,8 @@ function initMap() {
    if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(function(position) {
       console.log(position);
-      const { speed = 0.001 } = position;
-      const heading = window.alpha;
-      // const heading = map.getHeading();
+      const speed = typeof window.speed === 'number' ? Math.abs(window.speed.toFixed(1)) : 0.001;
+      // const heading = window.alpha;
       const { latitude, longitude } = position.coords;
       const [ comLat, comLng ] = latlng[0] || [];
       const [ lastLat, lastLng ] = latlng[latlng.length - 1] || [];
@@ -48,19 +55,25 @@ function initMap() {
       const [ nextLat, nextLng ] = latlng[0] || [];
       const nextposition = new google.maps.LatLng(nextLat, nextLng);
       const isArrived = latlng.length === 1 && google.maps.geometry.spherical.computeDistanceBetween(centerPosition, nextposition) < 5;
-
-      const offsetDeg = google.maps.geometry.spherical.computeHeading(centerPosition, nextposition);
       const remainDistance = google.maps.geometry.spherical.computeDistanceBetween(centerPosition, lastposition);
-
       const remainTime = remainDistance / speed;
-       if(routes.length > 1 && 1 < google.maps.geometry.spherical.computeDistanceBetween(routes[routes.length - 1], centerPosition) <5 ) {
-         routes.push(centerPosition);
+       routes.push(centerPosition);
+       let shouldRender = false
+       if(routes.length > 1 && google.maps.geometry.spherical.computeHeading(routes[routes.length - 2], centerPosition) !== 0) {
+         heading = -1*google.maps.geometry.spherical.computeHeading(routes[routes.length - 2], centerPosition);
+         const offsetDistance = google.maps.geometry.spherical.computeDistanceBetween(routes[routes.length - 2], centerPosition);
+         if(2 < offsetDistance && offsetDistance < 20) {
+           shouldRender = true;
+         }
        }
+       const nowDirection = heading < 0 ? 360 + heading : heading;
+       const targetDirection = google.maps.geometry.spherical.computeHeading(centerPosition, nextposition) < 0 ? 360 + google.maps.geometry.spherical.computeHeading(centerPosition, nextposition) : google.maps.geometry.spherical.computeHeading(centerPosition, nextposition);
+       const offsetDeg = targetDirection - nowDirection;
        isFirst && map.setCenter(centerPosition);
        if(isFirst) {
          marker = new google.maps.Marker({
              position: centerPosition,
-             map: map ,
+             map: map,
              icon: {
                path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
                scale: 4,
@@ -98,7 +111,7 @@ function initMap() {
            repeat: '20px',
          }],
        });
-       } else {
+     } else if(shouldRender) {
          marker.setPosition(centerPosition);
          marker.setIcon({
            path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
@@ -109,34 +122,37 @@ function initMap() {
          circle.setCenter(centerPosition);
          line.setPath(routes);
          dashLine.setPath([centerPosition, nextposition]);
-       }
-
-      let direction = '';
-      if(-5 <= offsetDeg && offsetDeg <= 5) {
-        direction = 'straight';
-      } else if (5 < offsetDeg && offsetDeg <= 80) {
-        direction = 'slight_right';
-      } else if(-80< offsetDeg && offsetDeg < -5) {
-        direction = 'slight_left';
-      } else if (80 < offsetDeg && offsetDeg <= 100) {
-        direction = 'right';
-      } else if(-100 < offsetDeg && offsetDeg <= -80) {
-        direction = 'left';
-      } else if (100 < offsetDeg && offsetDeg <= 180) {
-        direction = 'return';
-      } else if (-180 <= offsetDeg && offsetDeg <= -100) {
-        direction = 'return';
       }
-      console.log(isArrived, direction, offsetDeg, `${remainDistance/1000}km`, `${remainTime/60}min`);
-      if(isArrived) {
-        document.querySelector('#pointer').className = `pointer`;
-        setDom([['#nextAction', 'Arrived'], ['#distance', `0 m`], ['#remainTime', `0 min`], ['#speed', `${speed} m/s`]]);
-        return;
+      if (isFirst || shouldRender) {
+        let direction = '';
+        if(-5 <= offsetDeg && offsetDeg <= 5) {
+          direction = 'straight';
+        } else if (5 < offsetDeg && offsetDeg <= 45) {
+          direction = 'slight_left';
+        } else if(-45< offsetDeg && offsetDeg < -5) {
+          direction = 'slight_right';
+        } else if (45 < offsetDeg && offsetDeg <= 135) {
+          direction = 'left';
+        } else if(-135 < offsetDeg && offsetDeg <= -45) {
+          direction = 'right';
+        } else if (135 < offsetDeg && offsetDeg <= 180) {
+          direction = 'return';
+        } else if (-180 < offsetDeg && offsetDeg <= -135) {
+          direction = 'return';
+        } else if (-270 < offsetDeg && offsetDeg <= -180) {
+          direction = 'return';
+        }
+        console.log(isArrived, direction, offsetDeg, `${remainDistance/1000}km`, `${remainTime/60}min`);
+        if(isArrived) {
+          document.querySelector('#pointer').className = `pointer`;
+          setDom([['#nextAction', 'Arrived'], ['#distance', `0 m`], ['#remainTime', `0 min`], ['#speed', `${speed} m/s`]]);
+          return;
+        }
+        setDom([['#nextAction', `${direction}`], ['#distance', `${remainDistance.toFixed(1)}m`], ['#remainTime', `${(remainTime/60).toFixed(1)}min`], ['#speed', `${speed} m/s`]]);
+        document.querySelector('#pointer').className = `${direction} pointer`;
+        // infoWindow.setPosition(centerPosition);
+        // infoWindow.setContent('dsfsda');
       }
-      setDom([['#nextAction', `${direction} ${heading} ${speed}`], ['#distance', `${remainDistance.toFixed(1)}m`], ['#remainTime', `${(remainTime/60).toFixed(1)}min`], ['#speed', `${speed} m/s`]]);
-      document.querySelector('#pointer').className = `${direction} pointer`;
-      // infoWindow.setPosition(centerPosition);
-      // infoWindow.setContent('dsfsda');
       isFirst = false;
      }, function (error) {
       //处理错误
