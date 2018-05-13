@@ -76,19 +76,16 @@ function GetItemS(){
                     //This for loop iterates through each paths GPS coordinates
                     for( var j=0; j< Location.length; j++)
                         {
-                            //creating new google lat long instances
-                         var Lat= (ResourceC[i].locations[j].lat)
-                         var Lng= (ResourceC[i].locations[j].lng)
-                           var LatAndLngS=[]
+                        //creating new google lat long instances
+                         var Lat= (ResourceS[i].locations[j].lat)
+                         var Lng= (ResourceS[i].locations[j].lng)
+                         var LatAndLngS=[]
                          LatAndLngS.push(Lat,Lng)
                          LatAndLng.push(LatAndLngS)
-
-
-                            LocationArray.push(LatAndLngS);
-
+                         LocationArray.push(LatAndLngS);
                         }
                     //creating a new path class instance.
-                    var pathInstance = new Path(LocationArray,ResourceS[i]);
-                   availablePaths.push(pathInstance);
+                    var pathInstance = new Path(LocationArray,ResourceS[i], Location);
+                    availablePaths.push(pathInstance);
                 }
     }
