@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      <title>Navigator</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-pink.min.css">
+        <link rel="stylesheet" href="css/navigationApp.css" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <link rel="shortcut icon" sizes="196x196" href="images/icon.png" />
+        <link rel="apple-touch-icon-precomposed" href="images/icon.png" />
+    <title>Geolocation</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 100%;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+        <header class="mdl-layout__header">
+            <button onclick="location.href = 'index.html';" class="mdl-layout-icon mdl-button mdl-js-button mdl-button--icon">
+                <i class="material-icons">arrow_back</i>
+            </button>
+            <div class="mdl-layout__header-row">
+                <span class="mdl-layout-title" id="headerBarTitle">Route Navigation</span>
+            </div>
+        </header>
+
+        <main id="map" class="mdl-layout__content">
+            <!--   Navigate page content here: map  -->
+        </main>
+        <footer class="footer">
+          <div id="pointer" class="pointer"></div>
+          <div class="line">
+            <div class="left">next action:</div>
+            <div id="nextAction" class="right">head straight</div>
+          </div>
+          <div class="line">
+            <div class="left">distance:</div>
+            <div id="distance" class="right">0 m</div>
+          </div>
+          <div class="line">
+            <div class="right">remain time:</div>
+            <div id="remainTime" class="right">0 min</div>
+            <div class="right">speed:</div>
+            <div id="speed" class="right">0 m/s</div>
+          </div>
+        </footer>
+        <div id="toast" class="mdl-js-snackbar mdl-snackbar">
+            <div class="mdl-snackbar__text"></div>
+            <button class="mdl-snackbar__action" type="button"></button>
+        </div>
+    </div>
+
+
+
+
+    <script src="https://cdn.bootcss.com/babel-polyfill/7.0.0-beta.46/polyfill.min.js"></script>
+    <script src="js/initMap.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAf2IDlROrDFHHtw3_x_Cmc7F02_n_1lJo&callback=initMap&libraries=geometry"></script>
+    <!--   JavaScript files:   -->
+    <script src="https://code.getmdl.io/1.3.0/material.min.js"></script>
+    <script type="text/javascript">
+      function deviceOrientationListener(event) {
+        console.log(event);
+        window.alpha = 0;
+        if(event.webkitCompassHeading) {
+          alpha = event.webkitCompassHeading;
+        } else {
+          alpha = 360 - event.alpha;
+          // document.body.innerHTML = "What user agent u r using???";
+        }
+        drawCurrentPosition(window.map, window.infoWindow);
+      }
+
+      function motionHandler(event) {
+        // document.getElementById("interval").innerHTML = event.interval;
+        var acc = event.acceleration;
+        // document.getElementById("x").innerHTML = acc.x;
+        // document.getElementById("y").innerHTML = acc.y;
+        // document.getElementById("z").innerHTML = acc.z;
+        console.log(acc, accGravity, rotationRate);
+      }
+
+      // if (window.DeviceMotionEvent) {
+      //   window.addEventListener("devicemotion", motionHandler, false);
+      // } else {
+      //   document.body.innerHTML = "What user agent u r using???";
+      // }
+      if (window.DeviceOrientationEvent) {
+         window.addEventListener('deviceorientation', throttle(deviceOrientationListener, 10, 30))
+      } else {
+         document.body.innerHTML = "What user agent u r using???";
+      }
+      function throttle(method, delay, duration) {
+        var timer = null,
+            begin = new Date();
+        return function() {
+          var context = this,
+            args = arguments,
+            current = new Date();;
+          clearTimeout(timer);
+          if (current - begin >= duration) {
+            method.apply(context, args);
+            begin = current;
+          } else {
+            timer = setTimeout(function() {
+              method.apply(context, args);
+            }, delay);
+          }
+        }
+      }
+    </script>
+    <script src="js/utility.js"></script>
+    <script src="js/shared.js"></script>
+    <script src="js/navigatePage.js"></script>
+  </body>
+</html>

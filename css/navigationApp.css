@@ -1,0 +1,56 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#map {
+    width: 100%;
+    /*
+     * 100% of view height (100vh), minus:
+     *  -  Title bar: 56 pixels
+     *  -  Space at bottom: 128 pixels (increase to make more space)
+     */
+    height: calc(100vh - 184px);
+}
+
+.footer {
+  height: 120px;
+}
+.pointer {
+  height: 30px;
+  width: 30px;
+}
+.pointer.straight {
+  background: url('../images/straight.png') top center no-repeat;
+}
+.pointer.left {
+  background: url('../images/left.png') top center no-repeat;
+}
+.pointer.right {
+  background: url('../images/right.png') top center no-repeat;
+}
+.pointer.slight_left {
+  background: url('../images/slight_left.png') top center no-repeat;
+}
+.pointer.slight_right {
+  background: url('../images/slight_right.png') top center no-repeat;
+}
+.pointer.return {
+  background: url('../images/uturn.png') top center no-repeat;
+}
+.line {
+  height: 30px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  width: 100%;
+}
+.line .left {
+  width: 25%;
+}
+.line .right {
+  -webkit-box-flex: 1;
+      -ms-flex: 1;
+          flex: 1
+}
