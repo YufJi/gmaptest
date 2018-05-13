@@ -6,8 +6,7 @@
 // web service of campus clayton
 var APP_PREFIX = "monash.eng1003.navigationApp";
 
-function viewPath(pathIndex)
-{
+function viewPath(pathIndex) {
     // Save the selected path index to local storage so it can be accessed
     // from the Navigate page.
     console.log(availablePaths[pathIndex]);

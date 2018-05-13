@@ -68,7 +68,7 @@
 
 
     <script src="https://cdn.bootcss.com/babel-polyfill/7.0.0-beta.46/polyfill.min.js"></script>
-    <script src="js/initMap.js"></script>
+    <script src="js/navigatePage.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAf2IDlROrDFHHtw3_x_Cmc7F02_n_1lJo&callback=initMap&libraries=geometry"></script>
     <!--   JavaScript files:   -->
     <script src="https://code.getmdl.io/1.3.0/material.min.js"></script>
@@ -79,11 +79,10 @@
         drawCurrentPosition(window.map, window.infoWindow);
         // drawCurrentPosition(window.map, window.infoWindow);
       }
-
       if (window.DeviceMotionEvent) {
-        window.addEventListener("devicemotion", throttle(deviceOrientationListener, 1000, 1000));
+        // window.addEventListener("devicemotion", throttle(deviceOrientationListener, 1000, 1000));
       } else {
-        document.body.innerHTML = "What user agent u r using???";
+        // document.body.innerHTML = "What user agent u r using???";
       }
       function throttle(method, delay, duration) {
         var timer = null,
@@ -106,6 +105,5 @@
     </script>
     <script src="js/utility.js"></script>
     <script src="js/shared.js"></script>
-    <script src="js/navigatePage.js"></script>
   </body>
 </html>
